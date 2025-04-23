@@ -9,20 +9,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Optionally, you can add further validation (e.g., file size, type)
-    if (file.size > 10 * 1024 * 1024) { // Example: Limit file size to 10MB
+    // File Validation
+    if (file.size > 10 * 1024 * 1024) { 
       return NextResponse.json({ error: 'File is too large. Maximum size is 10MB.' }, { status: 400 })
     }
 
     // Convert the file to an ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
 
-    // Upload directly to public-write S3 bucket using fetch and PUT
+    // Upload S3 bucket using fetch and PUT
     const uploadUrl = `https://is215-upload-test1.s3.amazonaws.com/${encodeURIComponent(file.name)}`
     
     const response = await fetch(uploadUrl, {
       method: 'PUT',
-      body: arrayBuffer,  // Use ArrayBuffer here
+      body: arrayBuffer,  // Use ArrayBuffer
       headers: {
         "Content-Type": file.type,
       }
@@ -33,7 +33,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to upload to S3' }, { status: 500 })
     }
 
-    // Return success with the uploaded file URL
     return NextResponse.json({
       success: true,
       message: 'File uploaded to S3 successfully',
