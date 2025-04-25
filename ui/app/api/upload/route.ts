@@ -10,9 +10,9 @@ export async function POST(request: Request) {
     }
 
     // File Validation
-    if (file.size > 1 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       console.log('File too large, rejecting upload')
-      return NextResponse.json({ error: 'File is too large. Maximum size is 1MB.' }, { status: 400 }) // please check
+      return NextResponse.json({ error: 'File is too large. Maximum size is 10MB.' }, { status: 400 }); // please check
     }
     
 
