@@ -1,0 +1,33 @@
+import express from 'express';
+import mysql from 'mysql2/promise';  // or use pg for PostgreSQL
+import cors from 'cors';
+
+const app = express();
+const PORT = 5000;
+
+app.use(cors());
+
+const db = await mysql.createConnection({
+  host: 'your-rds-endpoint.amazonaws.com',
+  user: 'your-username',
+  password: 'your-password',
+  database: 'your-database'
+});
+
+app.get('/article', async (req, res) => {
+  const { id } = req.query;
+  try {
+    const [rows] = await db.execute('SELECT article FROM images WHERE id = ?', [id]);
+    if (rows.length > 0) {
+      res.json({ article: rows[0].article });
+    } else {
+      res.status(404).json({ message: 'Article not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching article', error });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
