@@ -81,7 +81,7 @@ def lambda_handler(event, context):
             logger.info("Labels: %s", labels)
             logger.info("Timestamp: %s", timestamp)
 
-            prompt = f"Write an SEO article with at least 1000 words or more about an image which was labeled as {', '.join(labels)}. Everything must be written in English. Give me the title first as Title: then a 100 character summary as Summary: and then body of the article as Article: in HTML format. Don't include the title in the Article and just use div for the HTML and add formating with Tailwind CSS in NextJS."
+            prompt = f"Write an SEO article with with a hook, an introduction, and a conclusion about an image which was labeled as {', '.join(labels)}. Never mention anything about the image or the labels in the article just use it as an inspiration. Everything must be written in English and consider adding headings. Give me the title first as Title: then a 100 character summary as Summary: and then body of the article as Article: in HTML format. Don't include the title in the Article and just use div for the HTML"
             logger.info("Generated prompt: %s", prompt)
 
             data = {
