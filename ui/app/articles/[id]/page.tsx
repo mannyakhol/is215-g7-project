@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, ArrowLeft, Share2 } from "lucide-react"
 import { use, useEffect, useState } from "react"
 import { ArticleItem } from "@/interface/article"
+import { ArticleContent } from "@/components/article-content"
 
 export default function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -93,10 +94,7 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
           />
         </div>
 
-        <div
-          className="prose prose-slate dark:prose-invert max-w-none mb-8"
-          dangerouslySetInnerHTML={{ __html: article.content }}
-        ></div>
+        <ArticleContent content={article.content} className="mb-8" />
 
         <div className="border-t pt-6 mt-8">
           <div className="flex items-center justify-between">
