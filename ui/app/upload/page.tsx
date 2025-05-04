@@ -273,7 +273,7 @@ export default function UploadPage() {
                   Clear
                 </Button>
                 <Button onClick={handleUpload} disabled={!selectedFile}>
-                  Upload & Generate Article
+                  Upload
                 </Button>
               </>
             )}
@@ -293,7 +293,7 @@ export default function UploadPage() {
                   Upload Another
                 </Button>
                 <Button asChild>
-                  <Link href="/articles">View Generated Article</Link>
+                  <Link href="/articles">View Articles</Link>
                 </Button>
               </>
             )}
