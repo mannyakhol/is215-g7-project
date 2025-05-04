@@ -9,13 +9,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // File Validation
+    // File Type Validation
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Only JPG and PNG files are allowed.' }, { status: 400 })
+    }
+
+    // File Size Validation
     if (file.size > 10 * 1024 * 1024) {
-      console.log('File too large, rejecting upload')
-      return NextResponse.json({ error: 'File is too large. Maximum size is 10MB.' }, { status: 400 }); // please check
+      return NextResponse.json({ error: 'File is too large. Maximum size is 10MB.' }, { status: 400 })
     }
     
-
     // Convert the file to an ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
 
