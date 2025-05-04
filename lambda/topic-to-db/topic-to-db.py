@@ -2,6 +2,7 @@ import boto3
 import os
 import json
 import logging
+import uuid
 from datetime import datetime
 
 dynamodb = boto3.resource('dynamodb')
@@ -37,7 +38,11 @@ def transform_data(raw_message):
     # Handle the new message format with bucket, key, and labels
     image_id = raw_message.get('key', '').split('/')[-1]  # Extract filename from key
     
+    # Generate a unique ID
+    unique_id = str(uuid.uuid4())
+    
     return {
+        'id': unique_id,
         'image_id': image_id,
         'DetectedLabels': [label['Name'] for label in raw_message.get('labels', [])],
         'Timestamp': datetime.utcnow().isoformat()

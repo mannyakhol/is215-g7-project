@@ -6,7 +6,7 @@ export async function GET() {
     const apiBaseUrl = process.env.API_BASE_URL
     
     // Fetch data from the provided API endpoint
-    const response = await fetch(`${apiBaseUrl}/all`, {
+    const response = await fetch(`${apiBaseUrl}/articles`, {
       headers: {
         'Accept': 'application/json'
       },
@@ -21,10 +21,7 @@ export async function GET() {
     const s3BucketUrl = process.env.S3_BUCKET_URL
 
     // Map the API response to match our ArticleListItem interface
-    const articles: ArticleListItem[] = data.map((item: any, index: number) => {
-      // Extract first 100 characters as summary
-      const summary = item.article?.substring(0, 100) + '...' || 'No summary available'
-      
+    const articles: ArticleListItem[] = data.map((item: any, index: number) => {      
       // Get date from timestamp or use current date
       let date = new Date().toLocaleDateString('en-US', { 
         year: 'numeric', 
@@ -44,13 +41,16 @@ export async function GET() {
           console.error('Error parsing timestamp:', e)
         }
       }
+
+      // Use the backend-provided ID if available, otherwise fall back to the index
+      const id = item.id || index + 1
       
       return {
-        id: index + 1,
-        title: `Analysis of ${item.image_id || 'Image'}`,
+        id: id,
+        title: item.title || 'Generating article...',
         date,
         imageUrl: `${s3BucketUrl}/${encodeURIComponent(item.image_id)}`,
-        summary,
+        summary: item.summary || 'Please wait...',
         tags: item.DetectedLabels || []
       }
     })

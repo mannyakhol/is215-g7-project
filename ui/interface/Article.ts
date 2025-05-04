@@ -1,5 +1,5 @@
 export interface ArticleListItem {
-    id: number
+    id: string | number
     title: string
     date: string
     imageUrl: string
@@ -8,7 +8,7 @@ export interface ArticleListItem {
 }
 
 export interface ArticleItem {
-    id: number
+    id: string | number
     title: string
     date: string
     imageUrl: string

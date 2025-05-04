@@ -3,22 +3,17 @@ import type { ArticleItem } from '@/interface/Article'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id) - 1 // Convert to zero-based index
+    // Get the requested ID
+    const requestedId = context.params.id
     
-    if (isNaN(id) || id < 0) {
-      return NextResponse.json(
-        { error: 'Invalid article ID' },
-        { status: 400 }
-      )
-    }
-
     const apiBaseUrl = process.env.API_BASE_URL
+    const s3BucketUrl = process.env.S3_BUCKET_URL
     
-    // Fetch all data from the API
-    const response = await fetch(`${apiBaseUrl}/all`, {
+    // Use the new dedicated endpoint for getting article by ID
+    const response = await fetch(`${apiBaseUrl}/articles?id=${requestedId}`, {
       headers: {
         'Accept': 'application/json'
       },
@@ -26,21 +21,16 @@ export async function GET(
     })
 
     if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: 'Article not found' },
+          { status: 404 }
+        )
+      }
       throw new Error(`API responded with status: ${response.status}`)
     }
 
-    const data = await response.json()
-    
-    // Check if the requested article exists in the response
-    if (!data[id]) {
-      return NextResponse.json(
-        { error: 'Article not found' },
-        { status: 404 }
-      )
-    }
-
-    const item = data[id]
-    const s3BucketUrl = process.env.S3_BUCKET_URL
+    const item = await response.json()
     
     // Get date from timestamp or use current date
     let date = new Date().toLocaleDateString('en-US', { 
@@ -64,11 +54,11 @@ export async function GET(
 
     // Map to ArticleItem format
     const article: ArticleItem = {
-      id: parseInt(params.id),
-      title: `Analysis of ${item.image_id || 'Image'}`,
+      id: item.id || requestedId,
+      title: item.title || 'Article is still being generated',
       date,
       imageUrl: `${s3BucketUrl}/${encodeURIComponent(item.image_id)}`,
-      content: item.article || 'No content available',
+      content: item.article || 'No content available yet.',
       tags: item.DetectedLabels || []
     }
 
