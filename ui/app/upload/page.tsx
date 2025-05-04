@@ -16,11 +16,33 @@ export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // List of allowed file types
+  const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png']
+
+  // Function to validate file type
+  const validateFileType = (file: File): boolean => {
+    if (!allowedFileTypes.includes(file.type)) {
+      setErrorMessage(`Invalid file type. Only JPG and PNG files are accepted.`)
+      return false
+    }
+    setErrorMessage(null)
+    return true
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
+      
+      // Validate file type
+      if (!validateFileType(file)) {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        return
+      }
+      
       setSelectedFile(file)
 
       // Create preview URL
@@ -51,6 +73,14 @@ export default function UploadPage() {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0]
+      
+      // Validate file type
+      if (!validateFileType(file)) {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        return
+      }
+      
       setSelectedFile(file)
 
       // Create preview URL
@@ -67,9 +97,8 @@ export default function UploadPage() {
     setPreviewUrl(null)
     setProgress(0)
     setUploadState("idle")
+    setErrorMessage(null)
   }
-
-  // ... existing code ...
 
   const uploadFile = async (file: File) => {
     const formData = new FormData()
@@ -109,7 +138,6 @@ export default function UploadPage() {
     }
   }
 
-  // Replace the simulateUpload function with:
   const handleUpload = () => {
     if (!selectedFile) return
     uploadFile(selectedFile)
@@ -128,7 +156,7 @@ export default function UploadPage() {
               Image Upload
             </CardTitle>
             <CardDescription>
-              Select an image to generate an article. Supported formats: JPG, PNG, WEBP.
+              Select an image to generate an article. Only JPG and PNG formats are supported.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -151,11 +179,14 @@ export default function UploadPage() {
                       <div className="text-muted-foreground text-sm text-center">
                         Drag and drop your image here or click to browse
                       </div>
+                      <div className="text-xs text-muted-foreground mt-2">
+                        Only JPG and PNG files are accepted
+                      </div>
                       <input
                         ref={fileInputRef}
                         id="file-upload"
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png"
                         className="hidden"
                         onChange={handleFileChange}
                       />
@@ -182,6 +213,14 @@ export default function UploadPage() {
                     </div>
                   )}
                 </div>
+                
+                {/* Error message */}
+                {errorMessage && (
+                  <div className="flex items-center gap-2 text-red-500 text-sm mt-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
               </>
             )}
 
