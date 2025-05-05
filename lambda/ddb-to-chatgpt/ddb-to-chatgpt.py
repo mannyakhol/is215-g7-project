@@ -27,10 +27,15 @@ def parse_chatgpt_response(content):
     if title_match:
         title = title_match.group(1).strip()
     
-    # Extract summary (case insensitive)
-    summary_match = re.search(r'Summary:(.*?)(?=Article:|$)', content, re.IGNORECASE | re.DOTALL)
+    # Extract summary (case insensitive) - improved to avoid capturing HTML content
+    summary_match = re.search(r'Summary:(.*?)(?=Article:|<div|$)', content, re.IGNORECASE | re.DOTALL)
     if summary_match:
         summary = summary_match.group(1).strip()
+        # Additional cleanup to remove any HTML tags if they got included
+        summary = re.sub(r'<[^>]+>', '', summary)
+        # Limit length to ensure it's truly a summary
+        if len(summary) > 200:  # If summary is suspiciously long
+            summary = summary[:200].strip() + "..."
     
     # Extract article (case insensitive)
     article_match = re.search(r'Article:(.*?)$', content, re.IGNORECASE | re.DOTALL)
